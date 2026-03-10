@@ -27,6 +27,12 @@ class AppBlockingService : AccessibilityService() {
         }
     }
 
+    override fun onInterrupt() {
+        //llamado cuando el servicio de accesibilidad es interrumpido
+        Log.d("LockAndGo", "Servicio de accesibilidad interrumpido.")
+    }
+
+
 
 
 
