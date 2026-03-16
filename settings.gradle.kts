@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Lock&Go"
 include(":app")
- 
+include(":lockandgo")
