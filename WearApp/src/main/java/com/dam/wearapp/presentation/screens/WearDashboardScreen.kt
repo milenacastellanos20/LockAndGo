@@ -1,25 +1,68 @@
 package com.dam.wearapp.presentation.screens
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingParams
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
-import java.sql.Time
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.dam.wearapp.R
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 /**
  * Método que pintará todos los elementos que conformarán la interfaz de la App en el reloj Wear OS
  * @author Hugo Garrido Rojo
  */
 @Composable
-fun WearDashboardScreen(pasos: Int, goal: Int) {
+fun WearDashboardScreen() {
+
+    val context = LocalContext.current
+
+    val prefs = remember {
+        context.getSharedPreferences(
+        "pasos_prefs",
+            Context.MODE_PRIVATE
+        )
+    }
+
+    var pasosMostrados by remember { mutableStateOf(0) }
+
+    val goal = 10000
+
+    fun actualizarPasos() {
+        val totalActual = prefs.getInt("ultimo_valor_sensor", 0)
+        val puntoCero = prefs.getInt("punto_cero", totalActual)
+        pasosMostrados = totalActual - puntoCero
+    }
+
+    DisposableEffect(Unit) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == "ultimo_valor_sensor") {
+                actualizarPasos()
+            }
+        }
+        actualizarPasos() // Carga inicial
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+
+        onDispose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
 
     val listState = rememberScalingLazyListState()
 
@@ -46,8 +89,8 @@ fun WearDashboardScreen(pasos: Int, goal: Int) {
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                     content = {
-                        circularProgressIndicatorComponent(pasos, goal)
-                        stepsInformationComponent(pasos, goal)
+                        CircularProgressIndicatorComponent(pasosMostrados, goal)
+                        StepsInformationComponent(pasosMostrados, goal)
                     }
 
                 )
@@ -75,10 +118,12 @@ fun WearDashboardScreen(pasos: Int, goal: Int) {
  * @author Hugo Garrido Rojo
  */
 @Composable
-fun circularProgressIndicatorComponent(pasos: Int, goal: Int) {
+fun CircularProgressIndicatorComponent(steps: Int, goal: Int) {
     CircularProgressIndicator(
-        modifier = Modifier.size(180.dp),
-        progress = pasos.toFloat() / goal.toFloat(),
+        modifier = Modifier
+            .size(180.dp)
+            .graphicsLayer(-1f),
+        progress = steps.toFloat() / goal.toFloat(),
         startAngle = 270f,
         indicatorColor = Color.Green,
         strokeWidth = 15.dp
@@ -90,19 +135,20 @@ fun circularProgressIndicatorComponent(pasos: Int, goal: Int) {
  * @author Hugo Garrido Rojo
  */
 @Composable
-fun stepsInformationComponent(pasos: Int, goal: Int) {
+fun StepsInformationComponent(steps: Int, goal: Int) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Pasos")
-        Spacer(Modifier.size(10.dp))
-        Text(text = pasos.toString())
-        Spacer(Modifier.size(10.dp))
-        Text(text = "Objetivo")
-        Spacer(Modifier.size(10.dp))
-        Text(text = goal.toString())
+        Image(
+            painter = painterResource(id = R.drawable.icono_pasos),
+            contentDescription = "Icono de pasos",
+            modifier = Modifier.size(80.dp)
+        )
+        Text(text = "$steps/", fontSize = 20.sp)
+        Text(text = "$goal pasos", fontWeight = androidx.compose.ui.
+        text.font.FontWeight.Bold)
     }
 
 
@@ -110,6 +156,7 @@ fun stepsInformationComponent(pasos: Int, goal: Int) {
 
 /**
  * Método que pintará el botón de sincronizar para que el usuario sincronice su progreso con la app móvil al instante
+ * @author Hugo Garrido Rojo
  */
 @Composable
 fun SyncButtonComponent() {
