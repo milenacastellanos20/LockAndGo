@@ -26,9 +26,7 @@ class StepCounterManager: Service(), SensorEventListener {
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         // Registramos el sensor para que escuche siempre
-        stepSensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-        }
+        start()
 
         // Lanzamos la notificación para que el servicio sea "inmortal"
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -47,11 +45,51 @@ class StepCounterManager: Service(), SensorEventListener {
         //que puedan resultar en más pasos
 
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-            val steps = event.values[0].toInt()
 
-            // Guardamos el valor actual en SharedPreferences
+            val totalSteps = event.values[0].toInt()
+
+            //Creamos el archivo de las SharedPreferences
             val prefs = getSharedPreferences("pasos_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("ultimo_valor_sensor", steps).apply()
+
+            //Guardamos el último valor
+            prefs.edit().putInt("ultimo_valor_registrado", totalSteps).apply()
+
+            //Lógica de notificación
+            val meta = prefs.getInt("meta_pasos", 10000)
+
+            val yaAvisado = prefs.getBoolean("notificacion_enviada", false)
+
+            if (totalSteps >= meta && !yaAvisado) {
+
+                val notificationManager = getSystemService(NOTIFICATION_SERVICE)
+                                                            as NotificationManager
+
+
+                val congratsNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("¡Felicidades!")
+                    .setContentText("Has alcanzado la meta de $meta pasos")
+                    .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+                    .build()
+
+                notificationManager.notify (2, congratsNotification)
+
+                prefs.edit().putBoolean("notificacion_enviada", true).apply()
+
+                //Para que deje de escuchar los pasos
+                //del sensor (ya no es necesario)
+                //dado a que se ha alcanzado la meta
+                stop()
+
+                //Para matar el servicio por completo
+                //y que la notificación de que el objetivo
+                //está en curso desaparezca, además de
+                //ahorrar batería
+                stopSelf()
+            }
+
+
         }
     }
 
@@ -64,6 +102,15 @@ class StepCounterManager: Service(), SensorEventListener {
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(serviceChannel)
         }
+    }
+
+    fun start() {
+        stepSensor?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+    fun stop() {
+        sensorManager.unregisterListener(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

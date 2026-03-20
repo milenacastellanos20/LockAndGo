@@ -1,6 +1,8 @@
 package com.dam.wearapp.presentation
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -14,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.dam.wearapp.presentation.screens.WearDashboardScreen
+import com.dam.wearapp.presentation.service.StepCounterManager
 import com.dam.wearapp.presentation.theme.LockGoTheme
 
 class MainActivity : ComponentActivity() {
@@ -61,6 +64,13 @@ class MainActivity : ComponentActivity() {
                         permissionsLauncher.launch(
                             android.Manifest.permission.ACTIVITY_RECOGNITION
                         )
+                    } else {
+                        val intent = Intent(context, StepCounterManager::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            context.startForegroundService(intent)
+                        } else {
+                            context.startService(intent)
+                        }
                     }
                 }
 

@@ -42,7 +42,6 @@ android {
 }
 
 dependencies {
-    // --- LIBRERÍAS ESPECÍFICAS DE WEAR OS ---
     implementation("androidx.wear.compose:compose-material:1.3.1")
     implementation("androidx.wear.compose:compose-foundation:1.3.1")
     implementation("androidx.wear.compose:compose-navigation:1.3.1")
