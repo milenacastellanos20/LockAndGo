@@ -1,6 +1,5 @@
 package com.dam.lockgo.presentation
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -15,37 +14,39 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
-fun PermissionsScreen(onAllPermissionsGranted: () -> Unit) {
+fun PermissionsScreen(
+    viewModel: PermissionsViewModel, // Recibimos el ViewModel
+    onAllPermissionsGranted: () -> Unit
+) {
     val context = LocalContext.current
-
-    // Estados para controlar si los permisos están activos
-    var hasActivityPermission by remember { mutableStateOf(checkActivityPermission(context)) }
-    var hasOverlayPermission by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
-    var hasAccessibilityPermission by remember { mutableStateOf(isAccessibilityServiceEnabled(context)) }
+    val state = viewModel.uiState // Observamos el estado del ViewModel
 
     // Launcher para el permiso de actividad física
     val activityPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted -> hasActivityPermission = isGranted }
+    ) { _ ->
+        // Cuando responde el pop-up, le decimos al ViewModel que refresque
+        viewModel.checkPermissions()
+    }
 
     // Observador para detectar cuando el usuario vuelve de Ajustes
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                // Re-comprobar permisos cuando el usuario regresa a la app
-                hasOverlayPermission = Settings.canDrawOverlays(context)
-                hasAccessibilityPermission = isAccessibilityServiceEnabled(context)
+                // El usuario ha vuelto de la pantalla de ajustes de Android
+                viewModel.checkPermissions()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Si todos están concedidos, podemos avanzar
-    if (hasActivityPermission && hasOverlayPermission && hasAccessibilityPermission) {
+    // Si el estado del ViewModel dice que todo está OK, navegamos
+    if (state.isAllGranted) {
         LaunchedEffect(Unit) { onAllPermissionsGranted() }
     }
 
@@ -59,13 +60,13 @@ fun PermissionsScreen(onAllPermissionsGranted: () -> Unit) {
 
         PermissionItem(
             title = "Actividad Física",
-            isGranted = hasActivityPermission,
+            isGranted = state.activityRecognition, // Usamos el estado del ViewModel
             onClick = { activityPermissionLauncher.launch(android.Manifest.permission.ACTIVITY_RECOGNITION) }
         )
 
         PermissionItem(
             title = "Superposición de Apps",
-            isGranted = hasOverlayPermission,
+            isGranted = state.overlay, // Usamos el estado del ViewModel
             onClick = {
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
                 context.startActivity(intent)
@@ -74,7 +75,7 @@ fun PermissionsScreen(onAllPermissionsGranted: () -> Unit) {
 
         PermissionItem(
             title = "Servicio de Accesibilidad",
-            isGranted = hasAccessibilityPermission,
+            isGranted = state.accessibility, // Usamos el estado del ViewModel
             onClick = {
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 context.startActivity(intent)
@@ -82,35 +83,23 @@ fun PermissionsScreen(onAllPermissionsGranted: () -> Unit) {
         )
     }
 }
-
 @Composable
 fun PermissionItem(title: String, isGranted: Boolean, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(title)
+        Text(text = title, style = MaterialTheme.typography.bodyLarge)
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
         ) {
-            Text(if (isGranted) "✓" else "Conceder")
+            Text(if (isGranted) "✓ Concedido" else "Conceder")
         }
     }
-}
-
-// Funciones auxiliares de comprobación
-fun checkActivityPermission(context: Context): Boolean {
-    return androidx.core.content.ContextCompat.checkSelfPermission(
-        context, android.Manifest.permission.ACTIVITY_RECOGNITION
-    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-}
-
-fun isAccessibilityServiceEnabled(context: Context): Boolean {
-    val expectedServiceName = "${context.packageName}/${context.packageName}.data.service.AppBlockingService"
-    val enabledServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-    return enabledServices?.contains(expectedServiceName) == true
 }

@@ -1,12 +1,9 @@
 package com.dam.lockgo
 
-import com.dam.lockgo.presentation.PermissionsScreen
-
-import android.content.Context
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -15,64 +12,44 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
-import android.content.pm.PackageManager
+import com.dam.lockgo.presentation.PermissionsScreen
+import com.dam.lockgo.presentation.PermissionsViewModel
 
 class MainActivity : ComponentActivity() {
+
+    // Instanciamos el ViewModel
+    private val permissionsViewModel: PermissionsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            // Aplicamos el sistema de diseño de Material 3
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Estado que controla si mostramos permisos o la app principal
-                    var needsPermissions by remember {
-                        mutableStateOf(!areAllPermissionsGranted(this))
+                    // Obtenemos el estado directamente del ViewModel
+                    val permissionState = permissionsViewModel.uiState
+
+                    // Estado local para controlar la navegación tras conceder permisos
+                    var allPermissionsGranted by remember {
+                        mutableStateOf(permissionState.isAllGranted)
                     }
 
-                    if (needsPermissions) {
-                        // Pasamos una función lambda que se ejecuta cuando todos los botones están en verde
-                        PermissionsScreen(onAllPermissionsGranted = {
-                            needsPermissions = false
-                        })
+                    if (!allPermissionsGranted) {
+                        PermissionsScreen(
+                            viewModel = permissionsViewModel,
+                            onAllPermissionsGranted = {
+                                allPermissionsGranted = true
+                            }
+                        )
                     } else {
                         MainDashboard()
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Comprueba si los tres permisos críticos están activos
-     */
-    private fun areAllPermissionsGranted(context: Context): Boolean {
-        val hasActivity = ContextCompat.checkSelfPermission(
-            context, android.Manifest.permission.ACTIVITY_RECOGNITION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val hasOverlay = Settings.canDrawOverlays(context)
-
-        val hasAccessibility = isAccessibilityServiceEnabled(context)
-
-        return hasActivity && hasOverlay && hasAccessibility
-    }
-
-    /**
-     * Lógica específica para verificar si nuestro servicio de accesibilidad está ON
-     */
-    private fun isAccessibilityServiceEnabled(context: Context): Boolean {
-        val expectedServiceName =
-            "${context.packageName}/${context.packageName}.data.service.AppBlockingService"
-        val enabledServices = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        return enabledServices?.contains(expectedServiceName) == true
     }
 }
 
