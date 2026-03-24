@@ -40,7 +40,7 @@ class AppBlockingService : AccessibilityService() {
     private fun bloquearApp(packageName: String): Boolean {
 
         //habra que pasarle la base de datos( room)
-        val appsBloqueadas = listOf("com.whatsapp", "com.instagram.android")
+        val appsBloqueadas = listOf("com.android.chrome", "com.android.settings")
         val pasosCompletados = false; // viene de Datos/sensores
 
         return appsBloqueadas.contains(packageName) && !pasosCompletados

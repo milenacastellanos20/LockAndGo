@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Lock&amp;Go</string>
+    <string name="accessibility_service_description">Permite a Lock&amp;Go detectar qué aplicaciones abres para poder bloquearlas si no has cumplido tus pasos.</string>
 </resources>
