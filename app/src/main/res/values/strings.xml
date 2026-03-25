@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Lock&amp;Go</string>
+    <string name="accessibility_description">Usado para detectar apps abiertas y bloquearlas</string>
 </resources>
