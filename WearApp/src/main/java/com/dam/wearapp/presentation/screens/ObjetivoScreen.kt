@@ -1,13 +1,9 @@
 package com.dam.wearapp.presentation.screens
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,17 +14,10 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.dam.wearapp.R
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dam.wearapp.presentation.service.PasosViewModel
+import com.dam.wearapp.presentation.service.DatosViewModel
 
 /**
  * Método que pintará todos los elementos que conformarán la interfaz de la App en el reloj Wear OS
@@ -36,7 +25,7 @@ import com.dam.wearapp.presentation.service.PasosViewModel
  */
 
 @Composable
-fun ObjetivoScreen(viewModel: PasosViewModel) {
+fun ObjetivoScreen(viewModel: DatosViewModel) {
 
     val applicaction = LocalContext.current.applicationContext as Application
 

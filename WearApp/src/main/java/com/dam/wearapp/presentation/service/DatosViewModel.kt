@@ -8,13 +8,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
-class PasosViewModel (application: Application): AndroidViewModel(application) {
+class DatosViewModel (application: Application): AndroidViewModel(application) {
 
     private val prefs = application.getSharedPreferences("pasos_prefs",
         Context.MODE_PRIVATE)
 
     //Obtención de variables
-    var pasosActuales by mutableStateOf(prefs.getInt("ultimo_valor_registrado", 0))
+    var pasosActuales by mutableStateOf(prefs.getInt("ultimos_pasos_calculados_registrados", 0))
         private set
 
     val meta = prefs.getInt("meta_pasos", 20)

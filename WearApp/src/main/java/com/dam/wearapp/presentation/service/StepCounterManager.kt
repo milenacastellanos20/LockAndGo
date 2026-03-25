@@ -14,6 +14,10 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 class StepCounterManager: Service(), SensorEventListener {
+
+    //Creamos nuestra variable de pasos que se mostrarán en la UI
+    //(los pasos desde que se inició la actividad)
+    private var steps = 0 //la inicializamos a 0, por ejemplo
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
     private val CHANNEL_ID = "step_counter_channel"
@@ -46,16 +50,49 @@ class StepCounterManager: Service(), SensorEventListener {
 
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
 
+            //Pasos totales del sensor (pasos registrados desde que se inició el reloj)
             val totalSteps = event.values[0].toInt()
 
-            //Creamos el archivo de las SharedPreferences
+            //Creamos u obtenemos el archivo de las SharedPreferences
             val prefs = getSharedPreferences("pasos_prefs", Context.MODE_PRIVATE)
 
-            //Guardamos el último valor
-            prefs.edit().putInt("ultimo_valor_registrado", totalSteps).apply()
+            //Obtenemos la meta de pasos que hemos establecido a partir de los datos del Intent
+            val meta = prefs.getInt("meta_pasos", 5000)
 
-            //Lógica de notificación
-            val meta = prefs.getInt("meta_pasos", 10000)
+            //Obtenemos la variable booleana que hemos establecido a partir de los datos del Intent
+            //para saber si tenemos que resetear los pasos o no
+            val resetSteps = prefs.getBoolean("reset_steps", false)
+
+            if (resetSteps) {
+                //A esta variable le restamos el último valor guardado
+                //en las SharedPreferences (equivalente al valor actual de la variable),
+                //dejándola en 0
+                steps = 0
+
+                //Ahora, lo guardamos
+                prefs.edit().putInt("ultimos_pasos_calculados_registrados", steps).apply()
+
+                //También guardamos el último valor del sensor registrado
+                //Esto lo utilizaremos en el futuro cómo el valor de pasos antiguo
+                prefs.edit().putInt("ultimos_pasos_sensor_registrados", totalSteps).apply()
+
+                //Cambiamos el valor de la variable booleana a false para que
+                //no se vuelva a ejecutar este bloque de código
+                prefs.edit().putBoolean("reset_steps", false).apply()
+
+            } else {
+
+                val valorAnterior = prefs.getInt("ultimos_pasos_sensor_registrados", 0)
+
+                steps += totalSteps - valorAnterior
+
+                //Guardamos el nuevo valor de los pasos a mostrar en la UI en las SharedPreferences
+                prefs.edit().putInt("ultimos_pasos_calculados_registrados", steps).apply()
+
+                //Finalmente, guardamos el nuevo valor de pasos totales en las SharedPreferences
+                prefs.edit().putInt("ultimos_pasos_sensor_registrados", totalSteps).apply()
+
+            }
 
             val yaAvisado = prefs.getBoolean("notificacion_enviada", false)
 
@@ -114,6 +151,20 @@ class StepCounterManager: Service(), SensorEventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        intent?.let {
+
+            val metaPasos = intent.getIntExtra("META_PASOS", 0)
+            val resetSteps = intent.getBooleanExtra("RESET_STEPS", false)
+
+            //Creamos u obtenemos el archivo de las SharedPreferences
+            val prefs = getSharedPreferences("pasos_prefs", Context.MODE_PRIVATE)
+
+            prefs.edit().putInt("meta_pasos", metaPasos).apply()
+            prefs.edit().putBoolean("reset_steps", resetSteps).apply()
+
+        }
+
         return START_STICKY
     }
 
