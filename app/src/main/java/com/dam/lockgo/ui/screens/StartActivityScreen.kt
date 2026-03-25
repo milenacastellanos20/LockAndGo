@@ -107,7 +107,8 @@ fun StartActivityButton(pasos: String, hayPasos: (Boolean) -> Unit, context: Con
 fun SinPasosAviso() {
 
     Text(
-        text = "¡No has introducido la meta de pasos!",
+        text = "¡No has introducido la meta de pasos o la meta es demasiado pequeña (menos de 500)!",
+        style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
         color = Color.Red
     )
 
@@ -115,7 +116,7 @@ fun SinPasosAviso() {
 
 fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Context) {
 
-    if (pasos.isEmpty()) {
+    if (pasos.isEmpty() || pasos.toInt() < 500)  {
         hayPasos(false)
         return
     }
