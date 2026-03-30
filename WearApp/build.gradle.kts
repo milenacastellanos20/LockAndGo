@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.dam.wearapp"
+        applicationId = "com.dam.lockgo"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
@@ -45,7 +45,6 @@ dependencies {
     implementation("androidx.wear.compose:compose-material:1.3.1")
     implementation("androidx.wear.compose:compose-foundation:1.3.1")
     implementation("androidx.wear.compose:compose-navigation:1.3.1")
-    implementation("com.google.android.gms:play-services-wearable:18.1.0")
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
 
     implementation(libs.play.services.wearable)

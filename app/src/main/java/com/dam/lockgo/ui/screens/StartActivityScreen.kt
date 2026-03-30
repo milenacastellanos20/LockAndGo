@@ -1,6 +1,8 @@
 package com.dam.lockgo.ui.screens
 
 import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +15,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,7 +108,7 @@ fun StartActivityButton(pasos: String, hayPasos: (Boolean) -> Unit, context: Con
 fun SinPasosAviso() {
 
     Text(
-        text = "¡No has introducido la meta de pasos o la meta es demasiado pequeña (menos de 500)!",
+        text = "¡No has introducido la meta de pasos o la meta es demasiado pequeña (menos de 20)!",
         style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
         color = Color.Red
     )
@@ -116,7 +117,7 @@ fun SinPasosAviso() {
 
 fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Context) {
 
-    if (pasos.isEmpty() || pasos.toInt() < 500)  {
+    if (pasos.isEmpty() || pasos.toInt() < 20)  {
         hayPasos(false)
         return
     }
@@ -128,13 +129,19 @@ fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Contex
         val messageClient = Wearable.getMessageClient(context)
 
         Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
+
+            Log.d("Función enviar datos ejecutada", "Nodos conectados: ${nodes.size}")
+
             for (node in nodes) {
                 messageClient.sendMessage(node.id,
                     "/start_activity",
                     pasos.toByteArray())
             }
-        }
 
+            Toast.makeText(context, "Datos enviados correctamente",
+                Toast.LENGTH_SHORT).show()
+
+        }
 
     }catch (e: Exception) {
         e.printStackTrace()

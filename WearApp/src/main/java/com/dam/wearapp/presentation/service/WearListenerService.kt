@@ -1,6 +1,9 @@
 package com.dam.wearapp.presentation.service
 
 import android.content.Intent
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 
@@ -8,7 +11,12 @@ class WearListenerService: WearableListenerService() {
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
 
+        Log.d("Mensaje recibido", "Path recibido: ${messageEvent.path}")
+
         if (messageEvent.path == "/start_activity") {
+
+            Toast.makeText(this, "Meta de pasos recibida",
+                Toast.LENGTH_SHORT).show()
 
             //Si el mensaje recibido contiene el path que le hemos
             //pasado desde la app móvil, entonces decodificamos
@@ -21,17 +29,25 @@ class WearListenerService: WearableListenerService() {
 
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("META_PASOS", metaPasos)
-                putExtra("RESET_STEPS", true)
 
             }
 
-            startActivity(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                var servicio = startForegroundService(intent)
+
+                var iniciadoServicio = servicio != null
+
+                Log.d("Servicio iniciado?", iniciadoServicio.toString())
+            } else {
+                var servicio = startService(intent)
+
+                var iniciadoServicio = servicio != null
+
+                Log.d("Servicio iniciado?", iniciadoServicio.toString())
+            }
 
         }
 
     }
-
-
-
 
 }

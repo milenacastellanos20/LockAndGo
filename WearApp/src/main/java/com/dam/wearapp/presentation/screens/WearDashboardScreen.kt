@@ -22,9 +22,7 @@ fun WearDashboardScreen() {
                                                 .getInstance(application))
 
 
-    val yaNotificado = viewModel.yaAvisado
-
-    if (!yaNotificado && viewModel.meta != 0) {
+    if (viewModel.hayObjetivo && !viewModel.yaAvisado) {
         ObjetivoScreen(viewModel)
     } else {
         SinObjetivoScreen()
