@@ -3,7 +3,6 @@ package com.dam.wearapp.presentation.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -13,7 +12,6 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import java.util.Locale
 
 class StepCounterManager: Service(), SensorEventListener {
 
@@ -28,7 +26,7 @@ class StepCounterManager: Service(), SensorEventListener {
         super.onCreate()
         createNotificationChannel()
 
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         // Lanzamos la notificación para que el servicio sea "inmortal"
@@ -51,11 +49,13 @@ class StepCounterManager: Service(), SensorEventListener {
 
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
 
+            Log.d("Sensor", "Sensor de pasos detectado")
+
             //Pasos totales del sensor (pasos registrados desde que se inició el reloj)
             val totalSteps = event.values[0].toInt()
 
             //Creamos u obtenemos el archivo de las SharedPreferences
-            val prefs = getSharedPreferences("pasos_prefs", Context.MODE_PRIVATE)
+            val prefs = getSharedPreferences("pasos_prefs", MODE_PRIVATE)
 
             //Obtenemos la meta de pasos que hemos establecido a partir de los datos del Intent
             val meta = prefs.getInt("meta_pasos", 0)
@@ -83,7 +83,7 @@ class StepCounterManager: Service(), SensorEventListener {
             if (totalSteps >= meta && !yaAvisado) {
 
                 val notificationManager = getSystemService(NOTIFICATION_SERVICE)
-                                                            as NotificationManager
+                        as NotificationManager
 
 
                 val congratsNotification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -103,10 +103,13 @@ class StepCounterManager: Service(), SensorEventListener {
                 prefs.edit().remove("ultimos_pasos_sensor_registrados").apply()
 
                 stopForeground(true)
+
                 //Para que deje de escuchar los pasos
                 //del sensor (ya no es necesario)
                 //dado a que se ha alcanzado la meta
                 stop()
+
+
 
                 //Para matar el servicio por completo
                 //y que la notificación de que el objetivo
@@ -118,7 +121,6 @@ class StepCounterManager: Service(), SensorEventListener {
 
         }
     }
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
@@ -135,6 +137,7 @@ class StepCounterManager: Service(), SensorEventListener {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
         }
     }
+
     fun stop() {
         sensorManager.unregisterListener(this)
     }
@@ -148,14 +151,14 @@ class StepCounterManager: Service(), SensorEventListener {
             val metaPasos = intent.getIntExtra("META_PASOS", 0)
 
             //Creamos u obtenemos el archivo de las SharedPreferences
-            val prefs = getSharedPreferences("pasos_prefs", Context.MODE_PRIVATE)
+            val prefs = getSharedPreferences("pasos_prefs", MODE_PRIVATE)
 
             prefs.edit().putInt("meta_pasos", metaPasos).apply()
 
         }
 
         // Registramos el sensor para que escuche siempre
-        //Es imporatnte poner el método start fuera del Intent
+        //Es importante poner el método start fuera del Intent
         //De lo contrario, si se mata el proceso en segundo plano
         //y se vuelve a iniciar, no se volverá a iniciar el listener
         //para el sensor

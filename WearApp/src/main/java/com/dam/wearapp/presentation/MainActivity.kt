@@ -20,9 +20,8 @@ import com.dam.wearapp.presentation.screens.WearDashboardScreen
 import com.dam.wearapp.presentation.theme.LockGoTheme
 
 val PERMISOS_REQUERIDOS = arrayOf(
-    Manifest.permission.BODY_SENSORS,
     Manifest.permission.ACTIVITY_RECOGNITION,
-    Manifest.permission.BODY_SENSORS_BACKGROUND
+    Manifest.permission.POST_NOTIFICATIONS
 )
 
 class MainActivity : ComponentActivity() {
@@ -37,8 +36,7 @@ class MainActivity : ComponentActivity() {
                 val launcher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions()
                 ) { resultados ->
-
-                    val todosOk = ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
+                    val todosOk = resultados.all { it.value }
                     if (todosOk) {
                         permisosConcedidos = true
                     } else {

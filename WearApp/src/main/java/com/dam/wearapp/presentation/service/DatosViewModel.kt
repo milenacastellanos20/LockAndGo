@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class DatosViewModel (application: Application): AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("pasos_prefs",
@@ -15,9 +17,7 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
 
     //Obtención de variables
     var meta by mutableStateOf(prefs.getInt("meta_pasos", 0))
-    val metaValida = meta > 0
-    var hayObjetivo by mutableStateOf(metaValida)
-        private set
+    val hayObjetivo: Boolean get() = meta > 0
     var pasosActuales by mutableStateOf(prefs.getInt("ultimos_pasos_calculados_registrados", 0))
         private set
     var yaAvisado by mutableStateOf(prefs.getBoolean("notificacion_enviada", false))
@@ -26,8 +26,6 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
         when (key) {
             "meta_pasos" -> {
                 meta = sharedPreferences.getInt(key, 0)
-
-                hayObjetivo = metaValida
             }
             "ultimos_pasos_calculados_registrados" -> {
                 pasosActuales = sharedPreferences.getInt(key, 0)

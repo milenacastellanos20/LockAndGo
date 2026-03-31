@@ -1,6 +1,8 @@
 package com.dam.wearapp.presentation.screens
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
@@ -21,8 +23,8 @@ fun WearDashboardScreen() {
                                                 .AndroidViewModelFactory
                                                 .getInstance(application))
 
-
-    if (viewModel.hayObjetivo && !viewModel.yaAvisado) {
+    Log.d("meta", "Meta de pasos antes de iniciar: ${viewModel.meta}")
+    if (viewModel.hayObjetivo) {
         ObjetivoScreen(viewModel)
     } else {
         SinObjetivoScreen()
