@@ -3,6 +3,9 @@ package com.dam.lockgo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import com.dam.lockgo.service.AppNavigation
+import com.dam.lockgo.ui.theme.LockGoTheme
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +27,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            LockGoTheme {
+                AppNavigation()
+            }
+        }
+    }
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
