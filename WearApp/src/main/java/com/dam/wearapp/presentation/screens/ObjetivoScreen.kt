@@ -36,15 +36,10 @@ import com.google.android.gms.wearable.Wearable
 @Composable
 fun ObjetivoScreen(viewModel: DatosViewModel) {
 
-    val applicaction = LocalContext.current.applicationContext as Application
     val context = LocalContext.current
 
     val steps = viewModel.pasosActuales
     val goal = viewModel.meta
-
-    //Variable para saber si el usuario ha terminado con la actividad
-    var goalReached by remember { mutableStateOf(true) }
-
 
     val listState = rememberScalingLazyListState()
 

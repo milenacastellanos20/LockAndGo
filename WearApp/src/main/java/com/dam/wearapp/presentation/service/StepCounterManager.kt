@@ -11,9 +11,8 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 class StepCounterManager: Service(), SensorEventListener {
 
@@ -157,6 +156,28 @@ class StepCounterManager: Service(), SensorEventListener {
 
         return START_STICKY
     }
+
+    //Si el servicio en segundo plano se destruye, se rompería la aplicación.
+    //Por lo tanto, voy a hacer que si el usuario ha detenido el servicio
+    //en segundo plano porque no se sabe estar quieto (algo muy común, por desgracia)
+    //se resetee el servicio y vuelva a contar pasos
+//    override fun onDestroy() {
+//        super.onDestroy()
+//
+//        Log.d("OnDestroy", "onDestroy ejecutado")
+//
+//        val prefs = getSharedPreferences("pasos_prefs", MODE_PRIVATE)
+//
+//        val isServiceFinished = prefs.getBoolean("meta_cumplida", false)
+//
+//        if (!isServiceFinished) {
+//           sendBroadcast(Intent(this, RestartReceiverService::class.java))
+//        }
+//
+//    }
+
+    //Esta parte se queda comentada por si se reutiliza en un futuro (no he conseguido que el servicio
+    //en segundo plano se reactive)
 
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

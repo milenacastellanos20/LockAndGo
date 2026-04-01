@@ -1,8 +1,10 @@
 package com.dam.wearapp.presentation.service
 
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.compose.runtime.getValue
@@ -20,6 +22,10 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
     val hayObjetivo: Boolean get() = meta > 0
     var pasosActuales by mutableStateOf(prefs.getInt("ultimos_pasos_calculados_registrados", 0))
         private set
+
+    //Hago una variable de tipo NotificationManager para poder quitar todas las notificaciones
+    //de la aplicación al finalizar la actividad y que no se solapen con las de una futura
+    private val notificationManager = application.getSystemService(NotificationManager::class.java)
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
         when (key) {
             "meta_pasos" -> {
@@ -28,12 +34,25 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
             "ultimos_pasos_calculados_registrados" -> {
                 pasosActuales = sharedPreferences.getInt(key, 0)
 
+                Log.d("Pasos", "Pasos actualizados: $pasosActuales")
+
                 //Hago esta comprobación para que en el caso de que
                 //el servicio no se haya matado a tiempo y haya contado
                 //algún paso de más, entonces los pasos que se muestren
                 //en la UI se ajusten a la meta
                 if (pasosActuales > meta) {
-                    pasosActuales = meta
+
+                    //Vuelvo a guardar en las SharedPreferences el valor igualado a la meta.
+                    //Si no hago esto, a la hora de cerrar y volver a abrir la aplicación, se cogerá
+                    //el último valor guardado en las SharedPreferences y se mostrará en la UI
+                    //(pudiendo ser mayor de la meta propuesta)
+                    prefs.edit().putInt("ultimos_pasos_calculados_registrados", meta).apply()
+
+                    //Pongo que la meta está cumplida y así el servicio no se vuelva a activar
+                    prefs.edit().putBoolean("meta_cumplida", true).apply()
+
+                    Log.d("Meta", "Los pasos se han igualado a la meta. Pasos actuales: $pasosActuales")
+
                 }
             }
         }
@@ -73,6 +92,9 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
             //Eliminamos todas las SharedPreferences para que la lógica
             //sea correcta en todas las actividades que se inicien
             prefs.edit().clear().apply()
+
+            //Elimino las notificaciones que se sigan mostrando (la de meta cumplida)
+            notificationManager.cancelAll()
 
         }
 
