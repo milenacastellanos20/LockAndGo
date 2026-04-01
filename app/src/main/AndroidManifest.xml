@@ -34,6 +34,7 @@
                     android:pathPrefix="/end_activity"
                     android:scheme="wear" />
             </intent-filter>
+        </service>
         <service
             android:name="com.dam.lockgo.data.service.AppBlockingService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
