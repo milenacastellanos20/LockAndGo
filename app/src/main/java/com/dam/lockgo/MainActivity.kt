@@ -3,9 +3,6 @@ package com.dam.lockgo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import com.dam.lockgo.service.AppNavigation
-import com.dam.lockgo.ui.theme.LockGoTheme
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.dam.lockgo.presentation.PermissionsScreen
 import com.dam.lockgo.presentation.PermissionsViewModel
+import com.dam.lockgo.service.AppNavigation
+import com.dam.lockgo.ui.theme.LockGoTheme
 
 class MainActivity : ComponentActivity() {
 
-    // Instanciamos el ViewModel
     private val permissionsViewModel: PermissionsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,32 +26,31 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             LockGoTheme {
-                AppNavigation()
-            }
-        }
-    }
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // Obtenemos el estado directamente del ViewModel
-                    val permissionState = permissionsViewModel.uiState
 
-                    // Estado local para controlar la navegación tras conceder permisos
-                    var allPermissionsGranted by remember {
-                        mutableStateOf(permissionState.isAllGranted)
-                    }
+                // Obtenemos el estado del ViewModel
+                val permissionState = permissionsViewModel.uiState
 
-                    if (!allPermissionsGranted) {
-                        PermissionsScreen(
-                            viewModel = permissionsViewModel,
-                            onAllPermissionsGranted = {
-                                allPermissionsGranted = true
-                            }
-                        )
-                    } else {
-                        MainDashboard()
+                // Estado local para saber si ya se concedieron todos los permisos
+                var allPermissionsGranted by remember {
+                    mutableStateOf(permissionState.isAllGranted)
+                }
+
+                MaterialTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        if (!allPermissionsGranted) {
+                            PermissionsScreen(
+                                viewModel = permissionsViewModel,
+                                onAllPermissionsGranted = {
+                                    allPermissionsGranted = true
+                                }
+                            )
+                        } else {
+                            // Tu navegación principal
+                            AppNavigation()
+                        }
                     }
                 }
             }
