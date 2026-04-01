@@ -1,4 +1,4 @@
-package com.dam.lockgo.ui.service
+package com.dam.lockgo.service
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween

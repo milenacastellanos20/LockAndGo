@@ -46,6 +46,8 @@ dependencies {
     implementation("androidx.wear.compose:compose-foundation:1.3.1")
     implementation("androidx.wear.compose:compose-navigation:1.3.1")
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 
     implementation(libs.play.services.wearable)
     implementation(platform(libs.androidx.compose.bom))

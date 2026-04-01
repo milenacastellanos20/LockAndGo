@@ -12,6 +12,8 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class StepCounterManager: Service(), SensorEventListener {
 
@@ -46,7 +48,6 @@ class StepCounterManager: Service(), SensorEventListener {
         //Para que sólamente cuente los pasos
         //y no tenga en cuenta otras medidas
         //que puedan resultar en más pasos
-
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
 
             Log.d("Sensor", "Sensor de pasos detectado")
@@ -78,29 +79,20 @@ class StepCounterManager: Service(), SensorEventListener {
                 prefs.edit().putInt("ultimos_pasos_sensor_registrados", totalSteps).apply()
             }
 
-            val yaAvisado = prefs.getBoolean("notificacion_enviada", false)
-
-            if (totalSteps >= meta && !yaAvisado) {
+            if (steps >= meta) {
 
                 val notificationManager = getSystemService(NOTIFICATION_SERVICE)
                         as NotificationManager
 
-
                 val congratsNotification = NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle("¡Felicidades!")
-                    .setContentText("Has alcanzado la meta de $meta pasos")
+                    .setContentText("Has alcanzado tu meta de $meta pasos")
                     .setSmallIcon(android.R.drawable.ic_menu_mylocation)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .build()
 
-                notificationManager.notify (2, congratsNotification)
-
-                prefs.edit().putBoolean("notificacion_enviada", true).apply()
-
-                //Eliminamos el valor anterior, para que así cada vez que se inicie la actividad,
-                //la lógica funcione correctamente
-                prefs.edit().remove("ultimos_pasos_sensor_registrados").apply()
+                notificationManager.notify(2, congratsNotification)
 
                 stopForeground(true)
 
@@ -108,7 +100,6 @@ class StepCounterManager: Service(), SensorEventListener {
                 //del sensor (ya no es necesario)
                 //dado a que se ha alcanzado la meta
                 stop()
-
 
 
                 //Para matar el servicio por completo

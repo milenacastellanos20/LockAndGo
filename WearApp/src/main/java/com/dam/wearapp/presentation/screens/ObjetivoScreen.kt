@@ -1,6 +1,9 @@
 package com.dam.wearapp.presentation.screens
 
 import android.app.Application
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -14,11 +17,16 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import com.dam.wearapp.R
 import com.dam.wearapp.presentation.service.DatosViewModel
+import com.google.android.gms.wearable.Wearable
 
 /**
  * Método que pintará todos los elementos que conformarán la interfaz de la App en el reloj Wear OS
@@ -29,9 +37,14 @@ import com.dam.wearapp.presentation.service.DatosViewModel
 fun ObjetivoScreen(viewModel: DatosViewModel) {
 
     val applicaction = LocalContext.current.applicationContext as Application
+    val context = LocalContext.current
 
     val steps = viewModel.pasosActuales
     val goal = viewModel.meta
+
+    //Variable para saber si el usuario ha terminado con la actividad
+    var goalReached by remember { mutableStateOf(true) }
+
 
     val listState = rememberScalingLazyListState()
 
@@ -74,7 +87,7 @@ fun ObjetivoScreen(viewModel: DatosViewModel) {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    SyncButtonComponent()
+                    SyncButtonComponent(steps, goal, viewModel, context)
                 }
             }
 
@@ -128,14 +141,57 @@ fun StepsInformationComponent(steps: Int, goal: Int) {
  * @author Hugo Garrido Rojo
  */
 @Composable
-fun SyncButtonComponent() {
+fun SyncButtonComponent(steps: Int, goal: Int, viewModel: DatosViewModel,
+                        context: Context) {
 
     Button(onClick = {
-        //TODO
+        EndActivity(steps, goal, viewModel, context)
     },
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Sincronizar ahora")
+        Text(text = "Sincronizar con el móvil")
     }
+
+}
+
+fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Context) {
+
+        if (steps != goal) {
+            Toast.makeText(context,
+                "¡Todavía no has completado tu meta de pasos!",
+                Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+
+        val goalReached = true
+
+        try {
+
+            val messageClient = Wearable.getMessageClient(context)
+
+            Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
+
+                for (node in nodes) {
+
+                    messageClient.sendMessage(node.id,
+                        "/end_activity",
+                        goalReached.toString().toByteArray())
+
+                }
+
+                Toast.makeText(context,
+                    "Actividad finalizada",
+                    Toast.LENGTH_SHORT)
+                    .show()
+
+            }
+
+            viewModel.reiniciarDatos()
+
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
+
 
 }
