@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Preview
 @Composable
 fun MainScreen(
-    onNavigateStartActivity: () -> Unit = {}
+    onNavigateAppSelection: () -> Unit = {}
 ) {
 
     Scaffold(
@@ -29,7 +29,7 @@ fun MainScreen(
                                 .padding(innerPadding),
                         contentAlignment = Alignment.Center)
         {
-            StartActivityScreenButtonComponent(onNavigateStartActivity)
+            StartActivityScreenButtonComponent(onNavigateAppSelection)
         }
 
     }

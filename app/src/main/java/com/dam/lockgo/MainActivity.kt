@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         } else {
-                            // Tu navegación principal
                             AppNavigation()
                         }
                     }

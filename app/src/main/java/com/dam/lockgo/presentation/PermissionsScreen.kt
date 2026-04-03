@@ -2,6 +2,7 @@ package com.dam.lockgo.presentation
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,12 @@ fun PermissionsScreen(
         ActivityResultContracts.RequestPermission()
     ) { _ ->
         // Cuando responde el pop-up, le decimos al ViewModel que refresque
+        viewModel.checkPermissions()
+    }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
         viewModel.checkPermissions()
     }
 
@@ -79,6 +86,23 @@ fun PermissionsScreen(
             onClick = {
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 context.startActivity(intent)
+            }
+        )
+
+        PermissionItem(
+            title = "Notificaciones",
+            isGranted = state.notifications, // Usamos el estado del ViewModel
+            onClick = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    // En Android 13+, lanzamos el pop-up nativo
+                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    // En versiones antiguas, si están desactivadas, enviamos a Ajustes de la App
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                }
             }
         )
     }
