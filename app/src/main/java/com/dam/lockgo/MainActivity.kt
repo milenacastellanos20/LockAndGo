@@ -12,8 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.dam.lockgo.presentation.PermissionsScreen
-import com.dam.lockgo.presentation.PermissionsViewModel
+import com.dam.lockgo.ui.screens.PermissionsScreen
+import com.dam.lockgo.service.PermissionsViewModel
 import com.dam.lockgo.service.AppNavigation
 import com.dam.lockgo.ui.theme.LockGoTheme
 

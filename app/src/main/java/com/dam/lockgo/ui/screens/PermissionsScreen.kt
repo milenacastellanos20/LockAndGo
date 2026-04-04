@@ -1,5 +1,6 @@
-package com.dam.lockgo.presentation
+package com.dam.lockgo.ui.screens
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.dam.lockgo.service.PermissionsViewModel
 
 @Composable
 fun PermissionsScreen(
@@ -61,7 +63,7 @@ fun PermissionsScreen(
         PermissionItem(
             title = "Actividad Física",
             isGranted = state.activityRecognition, // Usamos el estado del ViewModel
-            onClick = { activityPermissionLauncher.launch(android.Manifest.permission.ACTIVITY_RECOGNITION) }
+            onClick = { activityPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION) }
         )
 
         PermissionItem(

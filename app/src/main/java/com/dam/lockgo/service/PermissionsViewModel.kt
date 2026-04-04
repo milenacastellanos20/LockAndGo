@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation
+package com.dam.lockgo.service
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import com.dam.lockgo.domain.usecase.CheckPermissionsUseCase
-import com.dam.lockgo.domain.usecase.PermissionStatus
 
 class PermissionsViewModel(application: Application) : AndroidViewModel(application) {
 

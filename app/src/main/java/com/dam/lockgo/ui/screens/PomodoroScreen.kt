@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.rewards
+package com.dam.lockgo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,10 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dam.lockgo.presentation.pomodoro.PomodoroViewModel
 
 @Composable
-fun RewardScreen(
-    viewModel: RewardViewModel = RewardViewModel()
+fun PomodoroScreen(
+    viewModel: PomodoroViewModel = PomodoroViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -28,40 +29,44 @@ fun RewardScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Sistema de recompensas")
+        Text(text = "Pomodoro")
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Monedas: ${uiState.coins}")
+        Text(text = "Tiempo: ${uiState.minutesLeft}:${uiState.secondsLeft.toString().padStart(2, '0')}")
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = "Objetivos completados: ${uiState.completedObjectives}")
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (uiState.message.isNotEmpty()) {
-            Text(text = uiState.message)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Button(onClick = { viewModel.addCoins(5) }) {
-            Text("Añadir 5 monedas")
-        }
-
+        Text(text = "Estado: ${uiState.pomodoroState}")
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { viewModel.completeObjective(10) }) {
-            Text("Completar objetivo (+10)")
+        Text(text = "Pomodoros completados: ${uiState.completedPomodoros}")
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(onClick = { viewModel.startPomodoro() }) {
+            Text("Iniciar")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { viewModel.spendCoins(8) }) {
-            Text("Gastar 8 monedas")
+        Button(onClick = { viewModel.pausePomodoro() }) {
+            Text("Pausar")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { viewModel.clearMessage() }) {
-            Text("Limpiar mensaje")
+        Button(onClick = { viewModel.resetPomodoro() }) {
+            Text("Resetear")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { viewModel.completePomodoro() }) {
+            Text("Completar Pomodoro")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { viewModel.finishBreak() }) {
+            Text("Finalizar descanso")
         }
     }
 }
