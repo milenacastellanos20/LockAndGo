@@ -1,5 +1,6 @@
 package com.dam.lockgo.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun MainScreen(
     onNavigateAppSelection: () -> Unit = {}
 ) {
-
+    Log.d("Screen 1", "Screen 1 ejecutada")
     Scaffold(
         topBar = { TopBarComponent() },
     ) { innerPadding ->
