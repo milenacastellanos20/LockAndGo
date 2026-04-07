@@ -2,7 +2,10 @@ package com.dam.wearapp.presentation.screens
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
@@ -24,10 +27,46 @@ fun WearDashboardScreen() {
                                                 .getInstance(application))
 
     Log.d("meta", "Meta de pasos antes de iniciar: ${viewModel.meta}")
-    if (viewModel.hayObjetivo) {
-        ObjetivoScreen(viewModel)
-    } else {
-        SinObjetivoScreen()
+
+    var estadoActual = viewModel.hayObjetivo
+
+    AnimatedContent(
+        targetState = estadoActual,
+        transitionSpec = {
+
+            //Si la transición es de la pantalla de "Sin Objetivo"
+            // a la pantalla de cuando hay objetivo, entonces deslizaremos
+            //de izquierda a derecha y viceversa
+            if (estadoActual && !initialState) {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) togetherWith slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                )
+            } else {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                ) togetherWith slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                )
+            }
+
+        },
+        label = "AnimatedContent",
+    ) { estado ->
+
+        if (estado) {
+            ObjetivoScreen(viewModel)
+        } else {
+            SinObjetivoScreen()
+        }
+
     }
 
 }
+
+

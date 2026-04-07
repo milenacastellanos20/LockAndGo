@@ -1,9 +1,7 @@
 package com.dam.lockgo.service
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
-import com.dam.lockgo.data.service.AppBlockingService
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 

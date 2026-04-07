@@ -21,9 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.google.gson.Gson
-import android.net.Uri
-
 data class AppInfo(
     val name: String,
     val packageName: String,
@@ -51,36 +48,29 @@ fun AppSelectionScreen(
 
     Scaffold(
         topBar = { TopBarComponent(onBackClick = { onBack() }) },
-        bottomBar = {
-            Surface(
-                color = MaterialTheme.colorScheme.background, // Para que tenga fondo detrás del botón
-                modifier = Modifier.fillMaxWidth()
+        floatingActionButton = {
+            Button(
+                onClick = {
+                    if (selectedApps.isEmpty()) {
+                        // Si la lista está vacía, lanzamos el Toast
+                        android.widget.Toast.makeText(
+                            context,
+                            "No hay ninguna app seleccionada",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        onNavigateStartActivity(selectedApps.toList())
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp), // Separación de los bordes
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                Button(
-                    onClick = {
-                        if (selectedApps.isEmpty()) {
-                            // Si la lista está vacía, lanzamos el Toast
-                            android.widget.Toast.makeText(
-                                context,
-                                "No hay ninguna app seleccionada",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            onNavigateStartActivity(selectedApps.toList())
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Un poco de margen para que respire
-                ) {
-                    Text(
-                        text = "Establecer meta de pasos",
-                        fontSize = 16.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
-                }
+                Text("Establecer meta de pasos")
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier

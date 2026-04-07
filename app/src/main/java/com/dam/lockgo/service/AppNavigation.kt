@@ -58,7 +58,9 @@ fun AppNavigation() {
 
             context.sendBroadcast(intent)
 
-            navController.navigate("main")
+            navController.navigate("main") {
+                popUpTo(0) { inclusive = true }
+            }
             Log.d("Screen 1", "Actividad finalizada: ${viewModel.actividadFinalizada}")
         } else {
             context.startActivity(Intent(context, ActivityInProgressScreen::class.java))
