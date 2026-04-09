@@ -1,6 +1,10 @@
 package com.dam.lockgo.ui.screens
 
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -28,18 +32,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dam.lockgo.data.service.AppBlockingService
 import com.google.android.gms.wearable.Wearable
 
-@Preview
 @Composable
 fun StartActivityScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    selectedApps: List<String>
 ) {
 
     val context = LocalContext.current
     //Variables para el TextField
     var text by remember { mutableStateOf("") }
     val maxChars = 5
+    val prefs = context.getSharedPreferences("LockAndGoPrefs", Context.MODE_PRIVATE)
 
     //Variable para el botón
     var isPasos by remember { mutableStateOf(true) }
@@ -60,7 +66,13 @@ fun StartActivityScreen(
 
                 Spacer(modifier = Modifier.size(20.dp))
 
-                StartActivityButton(text, hayPasos = { isPasos = it }, context)
+                StartActivityButton(text, hayPasos = { isPasos = it }, context, selectedApps, prefs)
+
+                if (selectedApps.isNotEmpty()) {
+
+                    Text(selectedApps.toString())
+
+                }
 
                 if (!isPasos) {
                     SinPasosAviso()
@@ -92,11 +104,12 @@ fun TextFieldComponent(text: String, maxChars: Int,onValueChange: (String) -> Un
 }
 
 @Composable
-fun StartActivityButton(pasos: String, hayPasos: (Boolean) -> Unit, context: Context) {
+fun StartActivityButton(pasos: String, hayPasos: (Boolean) -> Unit, context: Context, selectedApps: List<String>,
+                        prefs: SharedPreferences) {
 
     Button(
         onClick = {
-            iniciarActividad(pasos, hayPasos, context = context)
+            iniciarActividad(pasos, hayPasos, context = context, selectedApps, prefs = prefs)
         }
     ) {
         Text(text = "Comenzar actividad")
@@ -115,7 +128,8 @@ fun SinPasosAviso() {
 
 }
 
-fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Context) {
+fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Context, selectedApps: List<String>,
+                     prefs: SharedPreferences) {
 
     if (pasos.isEmpty() || pasos.toInt() < 20)  {
         hayPasos(false)
@@ -125,6 +139,7 @@ fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Contex
     hayPasos(true)
 
     try {
+
         //Lógica de enviar al reloj la meta de pasos para comenzar la actividad
         val messageClient = Wearable.getMessageClient(context)
 
@@ -138,13 +153,58 @@ fun iniciarActividad(pasos: String, hayPasos: (Boolean) -> Unit, context: Contex
                     pasos.toByteArray())
             }
 
+            prefs.edit().putBoolean("actividad_finalizada", false).apply()
+
             Toast.makeText(context, "Datos enviados correctamente",
                 Toast.LENGTH_SHORT).show()
 
         }
 
+        iniciarBloqueo(context, selectedApps)
+
     }catch (e: Exception) {
         e.printStackTrace()
+    }
+
+}
+
+fun iniciarBloqueo(context: Context, selectedApps: List<String>) {
+
+    val intent = Intent(context, AppBlockingService::class.java)
+
+    intent.putStringArrayListExtra("apps_bloqueadas",
+        selectedApps.toCollection(ArrayList()))
+
+    val notificationManager = context.getSystemService(NotificationManager::class.java)
+
+    //Antes de iniciar la nueva actividad, cancelo cualquier notificación residual que pueda haber
+    notificationManager.cancelAll()
+
+    val servicioBloqueoIniciado = Toast.makeText(context,
+        "Servicio de bloqueo iniciado",
+        Toast.LENGTH_SHORT)
+
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        var servicio = context.startForegroundService(intent)
+
+        var iniciadoServicio = servicio != null
+
+        if (iniciadoServicio) {
+            servicioBloqueoIniciado.show()
+        }
+
+        Log.d("Servicio bloqueo iniciado?", iniciadoServicio.toString())
+    } else {
+        var servicio = context.startService(intent)
+
+        var iniciadoServicio = servicio != null
+
+        if (iniciadoServicio) {
+            servicioBloqueoIniciado.show()
+        }
+
+        Log.d("Servicio bloqueo iniciado?", iniciadoServicio.toString())
     }
 
 }
