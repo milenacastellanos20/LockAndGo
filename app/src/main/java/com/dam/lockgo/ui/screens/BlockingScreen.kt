@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dam.lockgo.ui.theme.LockGoTheme
+
+
 class BlockingScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +51,6 @@ class BlockingScreen : ComponentActivity() {
         finish()
     }
 }
-
 @Composable
 fun BlockingScreen(packageName: String, onExitClick: () -> Unit) {
     BackHandler {

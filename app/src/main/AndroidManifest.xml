@@ -62,6 +62,16 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <activity
+            android:name=".ui.screens.BlockingScreen"
+            android:exported="false"
+            android:excludeFromRecents="true"/>
+
+        <activity
+            android:name=".ui.screens.ActivityInProgressScreen"
+            android:exported="false"
+            android:excludeFromRecents="true"/>
     </application>
 
 </manifest>

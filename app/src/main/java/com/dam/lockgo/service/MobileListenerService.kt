@@ -2,19 +2,16 @@ package com.dam.lockgo.service
 
 import android.content.Intent
 import android.widget.Toast
-import com.dam.lockgo.data.service.AppBlockingService
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 
 class MobileListenerService: WearableListenerService() {
 
-    private val servicioBloqueo = AppBlockingService()
-
     override fun onMessageReceived(messageEvent: MessageEvent) {
 
         if (messageEvent.path == "/end_activity") {
             Toast.makeText(this,
-                "Meta de pasos completada: ${String(messageEvent.data)}",
+                "Meta de pasos completada",
                 Toast.LENGTH_SHORT)
                 .show()
             val prefs = getSharedPreferences("LockAndGoPrefs", MODE_PRIVATE)
@@ -26,7 +23,11 @@ class MobileListenerService: WearableListenerService() {
     }
 
     fun detenerServicioBloqueo() {
-        servicioBloqueo.servicioFinalizado(true)
+        val intent = Intent("finalizar_actividad").apply {
+            setPackage(packageName)
+        }
+
+        sendBroadcast(intent)
     }
 
 }
