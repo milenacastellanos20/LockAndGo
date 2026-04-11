@@ -34,7 +34,7 @@
             android:value="true" />
 
         <activity
-            android:name=".presentation.MainActivity"
+            android:name="com.dam.wearapp.presentation.MainActivity"
             android:exported="true"
             android:taskAffinity=""
             android:theme="@style/Theme.App.Starting">
@@ -46,7 +46,7 @@
         </activity>
 
         <service
-            android:name=".presentation.service.WearListenerService"
+            android:name="com.dam.wearapp.presentation.service.WearListenerService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
@@ -59,7 +59,7 @@
         </service>
 
         <service
-        android:name=".presentation.service.StepCounterManager"
+        android:name="com.dam.wearapp.presentation.service.StepCounterManager"
         android:foregroundServiceType="health"
             android:stopWithTask="false"
         android:exported="false" />
