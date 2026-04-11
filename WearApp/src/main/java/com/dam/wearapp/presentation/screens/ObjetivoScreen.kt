@@ -1,8 +1,6 @@
 package com.dam.wearapp.presentation.screens
 
-import android.app.Application
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,13 +15,8 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import com.dam.wearapp.R
 import com.dam.wearapp.presentation.service.DatosViewModel
 import com.google.android.gms.wearable.Wearable
@@ -159,8 +152,6 @@ fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Conte
             return
         }
 
-        val goalReached = true
-
         try {
 
             val messageClient = Wearable.getMessageClient(context)
@@ -169,9 +160,7 @@ fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Conte
 
                 for (node in nodes) {
 
-                    messageClient.sendMessage(node.id,
-                        "/end_activity",
-                        goalReached.toString().toByteArray())
+                    messageClient.sendMessage(node.id, "/end_activity", null)
 
                 }
 

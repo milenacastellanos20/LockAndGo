@@ -10,7 +10,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DatosViewModel (application: Application): AndroidViewModel(application) {
@@ -65,12 +64,6 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
     fun reiniciarDatos() {
 
         viewModelScope.launch {
-
-            //Pauso el hilo durante un segundo antes de eliminar
-            //las SharedPreferences para que el cambio de pantalla
-            //no se sienta tan abrupto
-
-            delay(1000)
 
             //Actualizo la shared preference que determina si hay meta o no
             //para que Compose cambie inmediatamente a la pestaña de

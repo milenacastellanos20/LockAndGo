@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/WearApp" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/lockandgo" />
           </set>
         </option>
       </GradleProjectSettings>

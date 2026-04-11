@@ -11,7 +11,6 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 
 class StepCounterManager: Service(), SensorEventListener {
