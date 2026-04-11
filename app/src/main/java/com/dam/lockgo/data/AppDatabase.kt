@@ -6,13 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [User::class, DailyProgress::class, BlockedApp::class],
-    version = 3,
+    entities = [CompletedActivity::class],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun userDao(): UserDao
     abstract fun lockAndGoDao(): LockAndGoDao
 
     companion object {
@@ -26,7 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "lockgo_database"
                 )
-                    .fallbackToDestructiveMigration() // Esto evita que la app pete al cambiar la versión
+                    .fallbackToDestructiveMigration() // Destruye las tablas viejas
                     .build()
                 INSTANCE = instance
                 instance

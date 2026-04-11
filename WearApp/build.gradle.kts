@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.dam.wearapp"
+    namespace = "com.dam.lockgo"
     compileSdk {
         version = release(36)
     }
