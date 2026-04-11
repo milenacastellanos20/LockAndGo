@@ -16,6 +16,7 @@ import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import androidx.compose.foundation.Image
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import com.dam.wearapp.R
 import com.dam.wearapp.presentation.service.DatosViewModel
@@ -169,9 +170,8 @@ fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Conte
                     Toast.LENGTH_SHORT)
                     .show()
 
+                viewModel.reiniciarDatos()
             }
-
-            viewModel.reiniciarDatos()
 
         }catch (e: Exception) {
             e.printStackTrace()
