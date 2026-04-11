@@ -35,6 +35,8 @@ class MobileListenerService : WearableListenerService() {
             val goal = String(messageEvent.data).toInt()
 
             guardarActividadCompletada(goal)
+
+            imprimirHistorial()
         }
 
     }
