@@ -5,20 +5,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LockAndGoDao {
-    //Pasos y Metas
-    @Query("SELECT * FROM DailyProgress WHERE date = :date")
-    fun getProgressByDate(date: String): Flow<DailyProgress?>
 
+    // Da todo el historial desde el mas reciente hasta el mas antiguo
+    @Query("SELECT * FROM completed_activities ORDER BY id DESC")
+    fun getAllCompletedActivities(): Flow<List<CompletedActivity>>
+
+    // Guarda una nueva meta cumplida
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveProgress(progress: DailyProgress)
-
-    //Apps Bloqueadas
-    @Query("SELECT * FROM BlockedApp")
-    fun getAllBlockedApps(): Flow<List<BlockedApp>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBlockedApp(app: BlockedApp)
-
-    @Delete
-    suspend fun deleteBlockedApp(app: BlockedApp)
+    suspend fun saveCompletedActivity(activity: CompletedActivity)
 }
+
