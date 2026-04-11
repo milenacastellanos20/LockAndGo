@@ -19,3 +19,5 @@ class PomodoroRepositoryImpl : PomodoroRepository {
         currentSession = session
     }
 }
+
+//Añadir

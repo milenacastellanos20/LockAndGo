@@ -8,3 +8,4 @@ data class PomodoroUiState(
     val pomodoroState: PomodoroState = PomodoroState.IDLE,
     val completedPomodoros: Int = 0
 )
+//Añadir
