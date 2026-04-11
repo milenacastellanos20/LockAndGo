@@ -1,7 +1,8 @@
-package com.dam.lockgo.presentation.rewards
+package com.dam.lockgo.service
 
 import androidx.lifecycle.ViewModel
 import com.dam.lockgo.data.repository.RewardRepositoryImpl
+import com.dam.lockgo.service.RewardUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.rewards
+package com.dam.lockgo.service
 
 data class RewardUiState(
     val coins: Int = 0,
