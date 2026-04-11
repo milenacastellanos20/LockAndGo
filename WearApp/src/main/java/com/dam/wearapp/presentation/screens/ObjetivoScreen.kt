@@ -160,9 +160,7 @@ fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Conte
             Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
 
                 for (node in nodes) {
-
-                    messageClient.sendMessage(node.id, "/end_activity", null)
-
+                    messageClient.sendMessage(node.id, "/end_activity", goal.toString().toByteArray())
                 }
 
                 Toast.makeText(context,
