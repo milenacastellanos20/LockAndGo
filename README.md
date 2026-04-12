@@ -106,5 +106,5 @@ El repositorio está dividido en dos módulos principales para facilitar su desp
 
 &#x20;  ```bash
 
-&#x20;  git clone \[https://github.com/TU-USUARIO/lock-and-go.git](https://github.com/TU-USUARIO/lock-and-go.git)
+&#x20;  git clone \[https://github.com/TU-USUARIO/LockAndGo.git](https://github.com/TU-USUARIO/LockAndGo.git)
 
