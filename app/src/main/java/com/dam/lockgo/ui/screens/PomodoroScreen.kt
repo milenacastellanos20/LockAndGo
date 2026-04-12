@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.pomodoro
+package com.dam.lockgo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,10 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dam.lockgo.service.PomodoroViewModel
 
 @Composable
 fun PomodoroScreen(
-    viewModel: PomodoroViewModel = PomodoroViewModel()
+    viewModel: PomodoroViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -40,33 +42,27 @@ fun PomodoroScreen(
         Text(text = "Pomodoros completados: ${uiState.completedPomodoros}")
         Spacer(modifier = Modifier.height(24.dp))
 
+
         Button(onClick = { viewModel.startPomodoro() }) {
             Text("Iniciar")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Button(onClick = { viewModel.pausePomodoro() }) {
             Text("Pausar")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Button(onClick = { viewModel.resetPomodoro() }) {
             Text("Resetear")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { viewModel.completePomodoro() }) {
-            Text("Completar Pomodoro")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = { viewModel.finishBreak() }) {
             Text("Finalizar descanso")
         }
     }
 }
-//Añadir

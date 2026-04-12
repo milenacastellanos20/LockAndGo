@@ -6,13 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [CompletedActivity::class],
-    version = 5,
+    entities = [CompletedActivity::class, RewardProfileEntity::class, OwnedBadgeEntity::class],
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun lockAndGoDao(): LockAndGoDao
+    abstract fun rewardDao(): RewardDao
 
     companion object {
         @Volatile

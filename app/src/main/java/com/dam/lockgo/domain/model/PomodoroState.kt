@@ -6,4 +6,3 @@ enum class PomodoroState {
     PAUSED,
     BREAK
 }
-//Añadir

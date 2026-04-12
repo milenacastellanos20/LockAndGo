@@ -5,4 +5,3 @@ data class PomodoroSession(
     val breakTimeMinutes: Int,
     val completedPomodoros: Int
 )
-//Añadir

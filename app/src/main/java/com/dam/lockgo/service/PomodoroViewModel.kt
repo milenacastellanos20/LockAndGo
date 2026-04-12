@@ -1,7 +1,9 @@
-package com.dam.lockgo.presentation.pomodoro
+package com.dam.lockgo.service
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.dam.lockgo.data.repository.RewardRepositoryImpl
 import com.dam.lockgo.domain.model.PomodoroState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -10,7 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PomodoroViewModel : ViewModel() {
+class PomodoroViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val rewardRepository = RewardRepositoryImpl(application)
 
     private val _uiState = MutableStateFlow(PomodoroUiState())
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
@@ -63,6 +67,11 @@ class PomodoroViewModel : ViewModel() {
 
     fun completePomodoro() {
         timerJob?.cancel()
+
+        viewModelScope.launch {
+            rewardRepository.completeObjective(5)
+        }
+
         _uiState.value = _uiState.value.copy(
             pomodoroState = PomodoroState.BREAK,
             completedPomodoros = _uiState.value.completedPomodoros + 1,
@@ -80,4 +89,3 @@ class PomodoroViewModel : ViewModel() {
         )
     }
 }
-//Añadir

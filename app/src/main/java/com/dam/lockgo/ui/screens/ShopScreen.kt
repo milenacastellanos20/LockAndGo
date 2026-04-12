@@ -19,9 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dam.lockgo.service.RewardViewModel
 
 @Composable
-fun RewardScreen(
-    onNavigateShop: () -> Unit = {},
-    onNavigateAchievements: () -> Unit = {},
+fun ShopScreen(
+    onBack: () -> Unit = {},
     viewModel: RewardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -37,13 +36,34 @@ fun RewardScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Sistema de recompensas")
+        Text(text = "Tienda")
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Monedas: ${uiState.coins}")
+        Text(text = "Monedas disponibles: ${uiState.coins}")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { viewModel.buyBadge("Bronce", 50) }) {
+            Text("Emblema Bronce - 50")
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = "Objetivos completados: ${uiState.completedObjectives}")
+        Button(onClick = { viewModel.buyBadge("Plata", 100) }) {
+            Text("Emblema Plata - 100")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { viewModel.buyBadge("Oro", 150) }) {
+            Text("Emblema Oro - 150")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { viewModel.buyBadge("Diamante", 200) }) {
+            Text("Emblema Diamante - 200")
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (uiState.message.isNotEmpty()) {
@@ -51,20 +71,8 @@ fun RewardScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Button(onClick = onNavigateShop) {
-            Text("Ir a la tienda")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = onNavigateAchievements) {
-            Text("Ver logros")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = { viewModel.clearMessage() }) {
-            Text("Limpiar mensaje")
+        Button(onClick = onBack) {
+            Text("Volver")
         }
     }
 }

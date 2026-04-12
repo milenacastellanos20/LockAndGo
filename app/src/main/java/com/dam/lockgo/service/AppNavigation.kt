@@ -20,8 +20,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dam.lockgo.ui.screens.PomodoroScreen
 import com.dam.lockgo.ui.screens.ActivityInProgressScreen
+import com.dam.lockgo.ui.screens.RewardScreen
 import com.google.gson.reflect.TypeToken
+import com.dam.lockgo.ui.screens.ShopScreen
+import com.dam.lockgo.ui.screens.AchievementsScreen
 
 @Composable
 fun AppNavigation() {
@@ -41,6 +45,9 @@ fun AppNavigation() {
             .AndroidViewModelFactory
             .getInstance(application))
 
+    // Sumar monedas al completar la actividad
+    val rewardViewModel: RewardViewModel = viewModel()
+
     Log.d("Sin screen", "Actividad finalizada: ${viewModel.actividadFinalizada}")
 
     //LaunchedEffect para cuando la variable cambie en tiempo real
@@ -54,6 +61,15 @@ fun AppNavigation() {
 
             val intent = Intent("end_activity_in_progress").apply {
                 setPackage(context.packageName)
+            }
+
+            // 10 monedas por cumplir pasos
+            val prefs = context.getSharedPreferences("LockAndGoPrefs", android.content.Context.MODE_PRIVATE)
+            val actividadEnCurso = prefs.getBoolean("actividad_en_curso", false)
+            if (actividadEnCurso) {
+                rewardViewModel.completeObjective(10)
+
+                prefs.edit().putBoolean("actividad_en_curso", false).apply()
             }
 
             context.sendBroadcast(intent)
@@ -105,7 +121,9 @@ fun AppNavigation() {
         composable("main") {
 
             MainScreen(
-                onNavigateAppSelection = { navController.navigate("app_selection") }
+                onNavigateAppSelection = { navController.navigate("app_selection") },
+                onNavigatePomodoro = { navController.navigate("pomodoro") },
+                onNavigateRewards = { navController.navigate("rewards") }
             )
 
         }
@@ -141,6 +159,30 @@ fun AppNavigation() {
                     navController.navigate("start_activity/$encodedJson")
                 }
 
+            )
+        }
+
+        composable("pomodoro") {
+            PomodoroScreen()
+        }
+
+
+        composable("rewards") {
+            RewardScreen(
+                onNavigateShop = { navController.navigate("shop") },
+                onNavigateAchievements = { navController.navigate("achievements") }
+            )
+        }
+
+        composable("shop") {
+            ShopScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("achievements") {
+            AchievementsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
