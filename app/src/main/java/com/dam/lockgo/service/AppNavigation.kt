@@ -24,6 +24,8 @@ import com.dam.lockgo.ui.screens.PomodoroScreen
 import com.dam.lockgo.ui.screens.ActivityInProgressScreen
 import com.dam.lockgo.ui.screens.RewardScreen
 import com.google.gson.reflect.TypeToken
+import com.dam.lockgo.ui.screens.ShopScreen
+import com.dam.lockgo.ui.screens.AchievementsScreen
 
 @Composable
 fun AppNavigation() {
@@ -62,7 +64,13 @@ fun AppNavigation() {
             }
 
             // 10 monedas por cumplir pasos
-            rewardViewModel.completeObjective(10)
+            val prefs = context.getSharedPreferences("LockAndGoPrefs", android.content.Context.MODE_PRIVATE)
+            val actividadEnCurso = prefs.getBoolean("actividad_en_curso", false)
+            if (actividadEnCurso) {
+                rewardViewModel.completeObjective(10)
+
+                prefs.edit().putBoolean("actividad_en_curso", false).apply()
+            }
 
             context.sendBroadcast(intent)
 
@@ -158,8 +166,24 @@ fun AppNavigation() {
             PomodoroScreen()
         }
 
+
         composable("rewards") {
-            RewardScreen()
+            RewardScreen(
+                onNavigateShop = { navController.navigate("shop") },
+                onNavigateAchievements = { navController.navigate("achievements") }
+            )
+        }
+
+        composable("shop") {
+            ShopScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("achievements") {
+            AchievementsScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
 
     }

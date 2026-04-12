@@ -63,7 +63,7 @@ fun MainScreen(
                         onNavigateRewards()
                     }
                 ) {
-                    Text("Ver recompensas")
+                    Text("Recompensas")
                 }
 
             }

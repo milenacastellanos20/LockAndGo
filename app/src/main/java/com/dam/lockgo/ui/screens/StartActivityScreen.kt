@@ -128,7 +128,7 @@ fun iniciarActividad(pasos: String, context: Context, selectedApps: List<String>
                     pasos.toByteArray())
             }
 
-            prefs.edit().putBoolean("actividad_finalizada", false).apply()
+            prefs.edit().putBoolean("actividad_finalizada", false).putBoolean("actividad_en_curso", true).apply()
 
             Toast.makeText(context, "Actividad iniciada en el reloj",
                 Toast.LENGTH_SHORT).show()

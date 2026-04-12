@@ -10,3 +10,16 @@ data class CompletedActivity(
     val date: String,
     val stepGoal: Int
 )
+
+@Entity(tableName = "reward_profile")
+data class RewardProfileEntity(
+    @PrimaryKey val id: Int = 1,
+    val coins: Int = 0,
+    val completedObjectives: Int = 0
+)
+
+@Entity(tableName = "owned_badges")
+data class OwnedBadgeEntity(
+    @PrimaryKey val name: String,
+    val cost: Int
+)

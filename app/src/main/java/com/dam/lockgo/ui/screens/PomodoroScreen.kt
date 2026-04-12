@@ -42,29 +42,24 @@ fun PomodoroScreen(
         Text(text = "Pomodoros completados: ${uiState.completedPomodoros}")
         Spacer(modifier = Modifier.height(24.dp))
 
+
         Button(onClick = { viewModel.startPomodoro() }) {
             Text("Iniciar")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Button(onClick = { viewModel.pausePomodoro() }) {
             Text("Pausar")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Button(onClick = { viewModel.resetPomodoro() }) {
             Text("Resetear")
         }
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { viewModel.completePomodoro() }) {
-            Text("Completar Pomodoro")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = { viewModel.finishBreak() }) {
             Text("Finalizar descanso")

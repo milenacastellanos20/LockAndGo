@@ -19,9 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dam.lockgo.service.RewardViewModel
 
 @Composable
-fun RewardScreen(
-    onNavigateShop: () -> Unit = {},
-    onNavigateAchievements: () -> Unit = {},
+fun AchievementsScreen(
+    onBack: () -> Unit = {},
     viewModel: RewardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -37,34 +36,25 @@ fun RewardScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Sistema de recompensas")
+        Text(text = "Logros")
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Monedas: ${uiState.coins}")
-        Spacer(modifier = Modifier.height(8.dp))
+        if (uiState.ownedBadges.isEmpty()) {
+            Text(text = "Aún no has comprado ningún emblema")
+        } else {
+            Text(text = "Emblemas comprados:")
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = "Objetivos completados: ${uiState.completedObjectives}")
+            uiState.ownedBadges.forEach { badge ->
+                Text(text = "- $badge")
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (uiState.message.isNotEmpty()) {
-            Text(text = uiState.message)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Button(onClick = onNavigateShop) {
-            Text("Ir a la tienda")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = onNavigateAchievements) {
-            Text("Ver logros")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = { viewModel.clearMessage() }) {
-            Text("Limpiar mensaje")
+        Button(onClick = onBack) {
+            Text("Volver")
         }
     }
 }
