@@ -14,11 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dam.lockgo.service.RewardViewModel
 
 @Composable
 fun RewardScreen(
-    viewModel: RewardViewModel = RewardViewModel()
+    viewModel: RewardViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

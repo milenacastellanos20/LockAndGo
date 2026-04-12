@@ -6,4 +6,3 @@ interface PomodoroRepository {
     fun getCurrentSession(): PomodoroSession
     fun saveSession(session: PomodoroSession)
 }
-//Añadir

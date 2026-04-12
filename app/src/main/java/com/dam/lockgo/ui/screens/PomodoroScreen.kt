@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.pomodoro
+package com.dam.lockgo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,10 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dam.lockgo.service.PomodoroViewModel
 
 @Composable
 fun PomodoroScreen(
-    viewModel: PomodoroViewModel = PomodoroViewModel()
+    viewModel: PomodoroViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -69,4 +71,3 @@ fun PomodoroScreen(
         }
     }
 }
-//Añadir

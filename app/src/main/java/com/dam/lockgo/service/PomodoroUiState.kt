@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.pomodoro
+package com.dam.lockgo.service
 
 import com.dam.lockgo.domain.model.PomodoroState
 
@@ -8,4 +8,3 @@ data class PomodoroUiState(
     val pomodoroState: PomodoroState = PomodoroState.IDLE,
     val completedPomodoros: Int = 0
 )
-//Añadir

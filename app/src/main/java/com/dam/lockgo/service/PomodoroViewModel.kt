@@ -1,4 +1,4 @@
-package com.dam.lockgo.presentation.pomodoro
+package com.dam.lockgo.service
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
