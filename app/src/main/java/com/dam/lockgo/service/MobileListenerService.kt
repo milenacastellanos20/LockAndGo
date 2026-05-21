@@ -13,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.dam.lockgo.ui.screens.iniciarBloqueo
+import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.first
 
 
@@ -20,15 +22,44 @@ class MobileListenerService : WearableListenerService() {
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
 
-        if (messageEvent.path == "/end_activity") {
-            Toast.makeText(
-                this,
-                "Meta de pasos completada",
-                Toast.LENGTH_SHORT
-            ).show()
+        val prefs = getSharedPreferences("LockAndGoPrefs", MODE_PRIVATE)
 
-            val prefs = getSharedPreferences("LockAndGoPrefs", MODE_PRIVATE)
-            prefs.edit().putBoolean("actividad_finalizada", true).apply()
+        if (messageEvent.path == "/ack_start") {
+
+            Log.d("ack", "Mensaje para iniciar el servicio de bloqueo recibido")
+
+            val selectedApps = prefs.getStringSet("apps_temporales", emptySet())?.toList() ?: emptyList()
+
+            iniciarBloqueo(this, selectedApps)
+
+            prefs.edit().putBoolean("actividad_finalizada", false).apply();
+
+            // Mostramos el Toast (necesita el Main Looper porque estamos en un servicio de fondo)
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                Toast.makeText(
+                    this,
+                    "Actividad iniciada en el reloj. Bloqueo activado.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
+
+
+        if (messageEvent.path == "/end_activity") {
+
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                Toast.makeText(
+                    this,
+                    "Meta de pasos completada",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            prefs.edit()
+                .putBoolean("actividad_finalizada", true)
+                .putBoolean("recompensa_pendiente", true)
+                .apply()
 
             detenerServicioBloqueo()
 
@@ -37,6 +68,15 @@ class MobileListenerService : WearableListenerService() {
             guardarActividadCompletada(goal)
 
             imprimirHistorial()
+
+            val messageClient = Wearable.getMessageClient(this)
+            messageClient.sendMessage(
+                messageEvent.sourceNodeId,
+                "/ack_end",
+                ByteArray(0)
+            ).addOnSuccessListener {
+                Log.d("MobileListener", "ACK de fin enviado al reloj.")
+            }
         }
 
     }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dam.lockgo.data.service.AppBlockingService
+import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 
 @Composable
@@ -185,25 +186,49 @@ fun iniciarActividad(pasos: String, context: Context, selectedApps: List<String>
 
         //Lógica de enviar al reloj la meta de pasos para comenzar la actividad
         val messageClient = Wearable.getMessageClient(context)
+        val capabilityClient  = Wearable.getCapabilityClient(context)
 
-        Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
 
-            Log.d("Función enviar datos ejecutada", "Nodos conectados: ${nodes.size}")
+        capabilityClient.getCapability(
+            "lockgo_wear_app",
+            CapabilityClient.FILTER_REACHABLE
+        ).addOnSuccessListener { capabilityInfo ->
+
+           val nodes = capabilityInfo.nodes
+
+           if (nodes.isEmpty()) {
+               Toast.makeText(
+                   context,
+                   "Error. No se ha detectado ningún SmartWatch con Lock&Go instalado",
+                   Toast.LENGTH_SHORT
+               ).show()
+               return@addOnSuccessListener
+           }
+
+            // Guardamos las apps a bloquear temporalmente en SharedPreferences
+            // para que el servicio pueda leerlas cuando el reloj responda
+            prefs.edit().putStringSet("apps_temporales", selectedApps.toSet()).apply()
 
             for (node in nodes) {
-                messageClient.sendMessage(node.id,
-                    "/start_activity",
-                    pasos.toByteArray())
+                messageClient.sendMessage(node.id, "/start_activity", pasos.toByteArray())
+                .addOnSuccessListener {
+                    // NO iniciamos el bloqueo aquí. Solo avisamos que se ha enviado.
+                    Toast.makeText(context, "Enviando meta al reloj...", Toast.LENGTH_SHORT).show()
+                    Log.d("start", "Mensaje para iniciar el servicio de conteo de pasos enviado")
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Error al comunicar con el reloj.", Toast.LENGTH_SHORT).show()
+                }
             }
 
-            prefs.edit().putBoolean("actividad_finalizada", false).putBoolean("actividad_en_curso", true).apply()
-
-            Toast.makeText(context, "Actividad iniciada en el reloj",
-                Toast.LENGTH_SHORT).show()
-
-            //Sólamente se inicia el servicio de bloqueo si se han enviado los datos al reloj
-            iniciarBloqueo(context, selectedApps)
+        }.addOnFailureListener {
+            Toast.makeText(
+                context,
+                "Error al comprobar conexión",
+                Toast.LENGTH_SHORT
+            ).show()
         }
+
 
     }catch (e: Exception) {
         e.printStackTrace()

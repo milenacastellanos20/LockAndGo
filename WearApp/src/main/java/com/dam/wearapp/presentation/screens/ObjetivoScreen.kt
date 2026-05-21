@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.dam.lockgo.R
 import com.dam.wearapp.presentation.service.DatosViewModel
+import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 
 /**
@@ -155,19 +156,45 @@ fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Conte
         try {
 
             val messageClient = Wearable.getMessageClient(context)
+            val capabilityClient = Wearable.getCapabilityClient(context)
 
-            Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
+            capabilityClient.getCapability(
+                "lockgo_mobile_app",
+                CapabilityClient.FILTER_REACHABLE
+            ).addOnSuccessListener { capabilityInfo ->
+
+                val nodes = capabilityInfo.nodes
+
+                if (nodes.isEmpty()) {
+                    Toast.makeText(
+                        context,
+                        "Error. No se ha detectado ningún móvil con Lock&Go instalado",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@addOnSuccessListener
+                }
 
                 for (node in nodes) {
                     messageClient.sendMessage(node.id, "/end_activity", goal.toString().toByteArray())
+                        .addOnSuccessListener {
+                            // SOLO reiniciamos los datos si el mensaje se ha enviado con éxito al móvil
+                            Toast.makeText(context,
+                                "Sincronizando con el móvil...",
+                                Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context,
+                                "Error al enviar datos al móvil",
+                                Toast.LENGTH_SHORT).show()
+                        }
                 }
-
-                Toast.makeText(context,
-                    "Actividad finalizada",
-                    Toast.LENGTH_SHORT)
-                    .show()
-
-                viewModel.reiniciarDatos()
+            }.addOnFailureListener {
+                Toast.makeText(
+                    context,
+                    "Error al comprobar conexión",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }catch (e: Exception) {

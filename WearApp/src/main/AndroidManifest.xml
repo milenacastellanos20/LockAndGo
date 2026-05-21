@@ -54,6 +54,11 @@
                 <data
                     android:scheme="wear"
                     android:host="*"
+                    android:pathPrefix="/ack_end" />
+
+                <data
+                    android:scheme="wear"
+                    android:host="*"
                     android:pathPrefix="/start_activity" />
             </intent-filter>
         </service>

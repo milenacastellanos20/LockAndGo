@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.dam.lockgo.ui.theme.LockGoTheme
+import androidx.activity.OnBackPressedCallback
 
 class ActivityInProgressScreen : ComponentActivity() {
 
@@ -51,6 +52,20 @@ class ActivityInProgressScreen : ComponentActivity() {
             IntentFilter("end_activity_in_progress"),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+
+                val intent = Intent(Intent.ACTION_MAIN).apply {
+                    addCategory(Intent.CATEGORY_HOME)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                startActivity(intent)
+
+            }
+        })
 
         setContent {
             LockGoTheme {

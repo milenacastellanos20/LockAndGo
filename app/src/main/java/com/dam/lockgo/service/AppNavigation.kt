@@ -16,9 +16,13 @@ import com.dam.lockgo.ui.screens.StartActivityScreen
 import com.google.gson.Gson
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dam.lockgo.ui.screens.PomodoroScreen
 import com.dam.lockgo.ui.screens.ActivityInProgressScreen
@@ -50,6 +54,26 @@ fun AppNavigation() {
 
     Log.d("Sin screen", "Actividad finalizada: ${viewModel.actividadFinalizada}")
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (!viewModel.actividadFinalizada) {
+                    val intent = Intent(context, ActivityInProgressScreen::class.java).apply {
+                        // Evita apilar múltiples instancias
+                        addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    }
+                    context.startActivity(intent)
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     //LaunchedEffect para cuando la variable cambie en tiempo real
     LaunchedEffect(viewModel.actividadFinalizada) {
         Log.d("LaunchedEffect", "Valor recibido: ${viewModel.actividadFinalizada}")
@@ -65,11 +89,11 @@ fun AppNavigation() {
 
             // 10 monedas por cumplir pasos
             val prefs = context.getSharedPreferences("LockAndGoPrefs", android.content.Context.MODE_PRIVATE)
-            val actividadEnCurso = prefs.getBoolean("actividad_en_curso", false)
-            if (actividadEnCurso) {
-                rewardViewModel.completeObjective(10)
+            val actividadEnCurso = prefs.getBoolean("recompensa_pendiente", false)
 
-                prefs.edit().putBoolean("actividad_en_curso", false).apply()
+            if (actividadEnCurso) {
+                rewardViewModel.completeObjective(50)
+                prefs.edit().putBoolean("recompensa_pendiente", false).apply()
             }
 
             context.sendBroadcast(intent)
@@ -78,9 +102,13 @@ fun AppNavigation() {
                 popUpTo(0) { inclusive = true }
             }
             Log.d("Screen 1", "Actividad finalizada: ${viewModel.actividadFinalizada}")
-        } else {
-            context.startActivity(Intent(context, ActivityInProgressScreen::class.java))
-            Log.d("Screen 2", "Actividad finalizada: ${viewModel.actividadFinalizada}")
+        }else {
+            // Tiempo real: actividad iniciada mientras la app está abierta
+            context.startActivity(
+                Intent(context, ActivityInProgressScreen::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
+            )
         }
     }
 
