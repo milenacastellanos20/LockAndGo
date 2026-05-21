@@ -68,7 +68,12 @@ class StepCounterManager: Service(), SensorEventListener {
 
                 prefs.edit().putInt("ultimos_pasos_sensor_registrados", valorAnterior).apply()
             } else {
+
                 steps += totalSteps - valorAnterior
+
+                if (meta > 0 && steps > meta) {
+                    steps = meta;
+                }
 
                 //Guardamos el nuevo valor de los pasos a mostrar en la UI en las SharedPreferences
                 prefs.edit().putInt("ultimos_pasos_calculados_registrados", steps).apply()

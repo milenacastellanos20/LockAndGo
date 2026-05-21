@@ -25,8 +25,8 @@ class MobileListenerService : WearableListenerService() {
                 this,
                 "Meta de pasos completada",
                 Toast.LENGTH_SHORT
-            )
-                .show()
+            ).show()
+
             val prefs = getSharedPreferences("LockAndGoPrefs", MODE_PRIVATE)
             prefs.edit().putBoolean("actividad_finalizada", true).apply()
 

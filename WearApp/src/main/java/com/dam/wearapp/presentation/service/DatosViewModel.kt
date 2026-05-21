@@ -40,7 +40,6 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
                 //algún paso de más, entonces los pasos que se muestren
                 //en la UI se ajusten a la meta
                 if (pasosActuales > meta) {
-
                     //Vuelvo a guardar en las SharedPreferences el valor igualado a la meta.
                     //Si no hago esto, a la hora de cerrar y volver a abrir la aplicación, se cogerá
                     //el último valor guardado en las SharedPreferences y se mostrará en la UI
@@ -51,7 +50,6 @@ class DatosViewModel (application: Application): AndroidViewModel(application) {
                     prefs.edit().putBoolean("meta_cumplida", true).apply()
 
                     Log.d("Meta", "Los pasos se han igualado a la meta. Pasos actuales: $pasosActuales")
-
                 }
             }
         }

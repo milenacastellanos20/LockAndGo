@@ -5,22 +5,28 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
 data class AppInfo(
     val name: String,
     val packageName: String,
@@ -48,6 +54,7 @@ fun AppSelectionScreen(
 
     Scaffold(
         topBar = { TopBarComponent(onBackClick = { onBack() }) },
+        // Botón flotante modernizado con degradado
         floatingActionButton = {
             Button(
                 onClick = {
@@ -64,34 +71,82 @@ fun AppSelectionScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp), // Separación de los bordes
+                    .padding(horizontal = 24.dp)
+                    .height(60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                contentPadding = PaddingValues(0.dp),
+                shape = RoundedCornerShape(16.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                Text("Establecer meta de pasos")
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xFFE53935), // Rojo
+                                    Color(0xFF43A047)  // Verde
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "ESTABLECER META DE PASOS",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        letterSpacing = 1.2.sp
+                    )
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
-        LazyColumn(
+        // Fondo principal oscuro
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1E1E1E), // Gris muy oscuro
+                            Color(0xFF121212)  // Casi negro
+                        )
+                    )
+                )
                 .padding(paddingValues)
         ) {
-            items(installedApps, key = { it.packageName }) { app ->
-                val isSelected = selectedApps.contains(app.packageName)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                // Añadimos padding al fondo para que el botón flotante no tape la última app
+                contentPadding = PaddingValues(top = 16.dp, bottom = 90.dp)
+            ) {
+                // Pequeño texto de cabecera opcional para darle contexto a la lista
+                item {
+                    Text(
+                        text = "Selecciona las apps a bloquear",
+                        color = Color(0xFFAAAAAA),
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                }
 
-                AppListItem(
-                    appInfo = app,
-                    isSelected = isSelected,
-                    onToggleSelection = {
-                        if (isSelected) {
-                            selectedApps.remove(app.packageName)
-                        } else {
-                            selectedApps.add(app.packageName)
+                items(installedApps, key = { it.packageName }) { app ->
+                    val isSelected = selectedApps.contains(app.packageName)
+
+                    AppListItem(
+                        appInfo = app,
+                        isSelected = isSelected,
+                        onToggleSelection = {
+                            if (isSelected) {
+                                selectedApps.remove(app.packageName)
+                            } else {
+                                selectedApps.add(app.packageName)
+                            }
                         }
-                    }
-                )
-                Divider(color = Color.LightGray, thickness = 0.5.dp)
+                    )
+                }
             }
         }
     }
@@ -103,23 +158,23 @@ fun AppListItem(
     isSelected: Boolean,
     onToggleSelection: () -> Unit
 ) {
-
     val iconBitmap = remember(appInfo.icon) {
         appInfo.icon.toBitmap().asImageBitmap()
     }
 
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        Color.Transparent
-    }
+    // Colores dinámicos dependiendo de si está seleccionada o no
+    val backgroundColor = if (isSelected) Color(0xFF43A047).copy(alpha = 0.15f) else Color.Transparent
+    val borderColor = if (isSelected) Color(0xFF43A047) else Color.Transparent
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp) // Separación entre tarjetas
+            .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
+            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
             .clickable { onToggleSelection() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp), // Padding interior de la tarjeta
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -134,16 +189,22 @@ fun AppListItem(
             text = appInfo.name,
             modifier = Modifier.weight(1f),
             fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = Color.White // Texto blanco para el tema oscuro
         )
 
+        // Checkbox personalizado con temática verde
         Checkbox(
             checked = isSelected,
-            onCheckedChange = null
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color(0xFF43A047), // Verde al marcar
+                uncheckedColor = Color(0xFFAAAAAA), // Gris inactivo
+                checkmarkColor = Color.White // Tick blanco
+            )
         )
     }
 }
-
 
 suspend fun getInstalledApps(context: Context): List<AppInfo> = withContext(Dispatchers.IO) {
     val pm = context.packageManager

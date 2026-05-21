@@ -163,12 +163,16 @@ fun AppNavigation() {
         }
 
         composable("pomodoro") {
-            PomodoroScreen()
+            PomodoroScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
-
 
         composable("rewards") {
             RewardScreen(
+                onBack = { navController.popBackStack() },
                 onNavigateShop = { navController.navigate("shop") },
                 onNavigateAchievements = { navController.navigate("achievements") }
             )

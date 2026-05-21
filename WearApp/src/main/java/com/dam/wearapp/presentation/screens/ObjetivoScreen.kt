@@ -144,7 +144,7 @@ fun SyncButtonComponent(steps: Int, goal: Int, viewModel: DatosViewModel,
 
 fun EndActivity(steps: Int, goal: Int, viewModel: DatosViewModel, context: Context) {
 
-        if (steps != goal) {
+        if (steps < goal) {
             Toast.makeText(context,
                 "¡Todavía no has completado tu meta de pasos!",
                 Toast.LENGTH_SHORT)
