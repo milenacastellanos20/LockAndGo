@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dam.lockgo.ui.theme.LockGoTheme
@@ -30,7 +29,23 @@ class BlockingScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Recogemos el nombre del paquete que nos manda el AppBlockingService
-        val blockedPackage = intent.getStringExtra("BLOCKED_PACKAGE") ?: "esta aplicación"
+        val blockedPackage = intent.getStringExtra("BLOCKED_PACKAGE")
+
+        val appName = if (blockedPackage != null) {
+
+            try {
+
+                val pm = packageManager
+                val appInfo = pm.getApplicationInfo(blockedPackage, 0)
+                pm.getApplicationLabel(appInfo).toString();
+
+            } catch (e: Exception) {
+                "esta aplicación"
+            }
+
+        } else {
+            "esta aplicación"
+        }
 
         setContent {
             LockGoTheme() {
@@ -39,7 +54,7 @@ class BlockingScreen : ComponentActivity() {
                     color = MaterialTheme.colorScheme.errorContainer // Mantenemos tu Surface original intacta
                 ) {
                     BlockingScreen(
-                        packageName = blockedPackage,
+                        appName = appName,
                         onExitClick = { volverAlInicio() }
                     )
                 }
@@ -58,7 +73,7 @@ class BlockingScreen : ComponentActivity() {
 }
 
 @Composable
-fun BlockingScreen(packageName: String, onExitClick: () -> Unit) {
+fun BlockingScreen(appName: String, onExitClick: () -> Unit) {
     BackHandler {
         onExitClick()
     }
@@ -122,7 +137,7 @@ fun BlockingScreen(packageName: String, onExitClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "No puedes usar la app porque aún no has cumplido tu meta de pasos.",
+                    text = "No puedes usar $appName porque aún no has cumplido tu meta de pasos.",
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     color = Color.LightGray,

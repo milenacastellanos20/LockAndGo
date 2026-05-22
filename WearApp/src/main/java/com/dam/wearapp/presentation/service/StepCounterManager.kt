@@ -36,6 +36,7 @@ class StepCounterManager: Service(), SensorEventListener {
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setColor(android.graphics.Color.parseColor("#E53935"))
             .build()
 
         startForeground(1, notification)
@@ -93,6 +94,7 @@ class StepCounterManager: Service(), SensorEventListener {
                     .setSmallIcon(android.R.drawable.ic_menu_mylocation)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
+                    .setColor(android.graphics.Color.parseColor("#43A047"))
                     .build()
 
                 notificationManager.notify(2, congratsNotification)

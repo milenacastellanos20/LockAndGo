@@ -116,6 +116,7 @@ class AppBlockingService : AccessibilityService() {
             .setContentText("Lock&Go ha desbloqueado las aplicaciones")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setColor(android.graphics.Color.parseColor("#43A047"))
             .build()
         Log.d("LockAndGo", "Paso 1")
 
@@ -139,6 +140,7 @@ class AppBlockingService : AccessibilityService() {
             .setOngoing(true)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setColor(android.graphics.Color.parseColor("#E53935"))
             .build()
 
         startForeground(1, notification)

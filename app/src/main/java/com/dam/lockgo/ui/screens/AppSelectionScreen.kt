@@ -3,6 +3,12 @@ package com.dam.lockgo.ui.screens
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,11 +27,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 
 data class AppInfo(
     val name: String,
@@ -41,6 +52,8 @@ fun AppSelectionScreen(
 ) {
     val context = LocalContext.current
 
+    var isLoading by remember { mutableStateOf(true) }
+
     // Estado para guardar la lista de apps cargadas
     var installedApps by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
 
@@ -49,7 +62,12 @@ fun AppSelectionScreen(
 
     // Cargamos las apps de fondo para no congelar la pantalla
     LaunchedEffect(Unit) {
-        installedApps = getInstalledApps(context)
+
+        installedApps =  withContext(Dispatchers.IO) {
+            getInstalledApps(context)
+        }
+
+        isLoading = false;
     }
 
     Scaffold(
@@ -117,35 +135,50 @@ fun AppSelectionScreen(
                 )
                 .padding(paddingValues)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                // Añadimos padding al fondo para que el botón flotante no tape la última app
-                contentPadding = PaddingValues(top = 16.dp, bottom = 90.dp)
-            ) {
-                // Pequeño texto de cabecera opcional para darle contexto a la lista
-                item {
-                    Text(
-                        text = "Selecciona las apps a bloquear",
-                        color = Color(0xFFAAAAAA),
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+
+            if (isLoading) {
+
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    GradientCircularProgressIndicator(
+                        size = 60.dp,
+                        strokeWidth = 6.dp
                     )
                 }
 
-                items(installedApps, key = { it.packageName }) { app ->
-                    val isSelected = selectedApps.contains(app.packageName)
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    // Añadimos padding al fondo para que el botón flotante no tape la última app
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 90.dp)
+                ) {
+                    // Pequeño texto de cabecera opcional para darle contexto a la lista
+                    item {
+                        Text(
+                            text = "Selecciona las apps a bloquear",
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                        )
+                    }
 
-                    AppListItem(
-                        appInfo = app,
-                        isSelected = isSelected,
-                        onToggleSelection = {
-                            if (isSelected) {
-                                selectedApps.remove(app.packageName)
-                            } else {
-                                selectedApps.add(app.packageName)
+                    items(installedApps, key = { it.packageName }) { app ->
+                        val isSelected = selectedApps.contains(app.packageName)
+
+                        AppListItem(
+                            appInfo = app,
+                            isSelected = isSelected,
+                            onToggleSelection = {
+                                if (isSelected) {
+                                    selectedApps.remove(app.packageName)
+                                } else {
+                                    selectedApps.add(app.packageName)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -224,4 +257,45 @@ suspend fun getInstalledApps(context: Context): List<AppInfo> = withContext(Disp
 
         AppInfo(name, packageName, icon)
     }.sortedBy { it.name.lowercase() }
+}
+
+@Composable
+fun GradientCircularProgressIndicator(
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    strokeWidth: Dp = 5.dp
+) {
+
+    val infiniteTransition = rememberInfiniteTransition(label = "rotacion_carga")
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "angulo"
+    )
+
+    val gradientBrush = Brush.sweepGradient(
+        colors = listOf(
+            Color(0xFF4CAF50), // Verde
+            Color(0xFFE53935), // Rojo
+            Color(0xFF4CAF50)  // Verde otra vez para continuidad
+        )
+    )
+
+    Canvas(
+        modifier = modifier
+            .size(size)
+            .rotate(angle)
+    ) {
+        drawArc(
+            brush = gradientBrush,
+            startAngle = 0f,
+            sweepAngle = 280f,
+            useCenter = false,
+            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+        )
+    }
 }
